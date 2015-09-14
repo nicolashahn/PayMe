@@ -1,0 +1,21 @@
+{{extend 'layout.html'}}
+
+<h4>Payment Sent!</h4>
+<br>
+
+<table id="test">
+	<tr>
+	    <td>Payment to:</td>
+     	<td>{{=posted_by_name}}</td> 
+    </tr><tr> 	
+	 	<td>For: </td>
+	 	<td>{{=post_body}}</td> 
+ 	</tr>
+ 	</tr><tr> 	
+	 	<td>Amount: </td>
+	 	<td>{{=post_amount}}</td> 
+ 	</tr>
+</table>
+
+<br>
+<a href="{{=home_url}}">Back to charges</a>

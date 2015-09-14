@@ -1,0 +1,19 @@
+{{extend 'layout.html'}}
+<h1 id="test">
+    Thank your for your payment
+</h1>
+<script>
+    $(document).ready(function() {
+        $("#test").click(ajax_addItem);
+        function ajax_addItem() {
+            jQuery.ajax({
+                method:'post', url:'https://www.paypal.com/cgi-bin/webscr/cmd=_notify-validate',
+                data:{},
+                success: function(data) {
+                    alert(data);
+                }
+            });
+        }
+    });
+</script>
+{{=vars}}

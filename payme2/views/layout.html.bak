@@ -1,0 +1,182 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<!--
+Design by Free CSS Templates
+http://www.freecsstemplates.org
+Released for free under a Creative Commons Attribution 2.5 License
+
+Title      : Fun Ride
+Version    : 1.0
+Released   : 20070527
+Description: A two-column fixed-width template suitable for small websites.
+
+-->
+<html xmlns="http://www.w3.org/1999/xhtml">
+ <head>
+  <title>
+   {{=response.title or request.application}}
+  </title>
+  {{response.files.append(URL(request.application,'static','plugin_layouts/layouts/FunRide/default.css'))}}
+  {{response.files.append(URL('static','plugin_layouts/superfish.js'))}}
+  {{include 'web2py_ajax.html'}}
+  <style>
+ul.web2py-menu-vertical { width: 150px; position: relative; top:1em; left:1em;  z-index:30; border:0; margin:0; padding: 0; list-style: none; text-decoration: none;}
+ul.web2py-menu-vertical li { margin:0; padding:0; border:0; width: 150px; background: black; text-align:left;}
+ul.web2py-menu-vertical li a { margin:0; padding: 1px 3px 1px 3px; border:0; width: 144px; color: white; font-size:12px;}
+div.flash { position: fixed; float: right; padding: 10px; top: 10px; right: 30px; opacity: 0.75; margin: 10px 10px 10px 10px; text-align: center; clear: both; color: #fff; font-size: 11pt; text-align: center; vertical-align: middle; cursor: pointer; background: black; border: 2px solid #fff; -moz-border-radius: 5px; -webkit-border-radius: 5px; z-index: 2; }
+div.error { background-color: red; color: white; padding: 3px; }
+.auth_navbar { text-align:right; z-index:20; position: absolute; top: 2px; right:30px; border:0; padding:0 }
+  </style>
+ </head>
+ <body>
+  <!-- start header -->
+  {{try:}}{{=auth.navbar(action=URL('default','user'))}}{{except:pass}}
+
+  <div id="wrapper">
+   <div id="header">
+    <div id="logo">
+     <h1>
+      {{=response.title or request.application}}
+     </h1>
+     <h2>
+      {{=response.subtitle or '=response.subtitle'}}
+     </h2>
+    </div>
+    <!-- end div#logo -->
+    <div id="menu">
+     {{=MENU(response.menu,_class='web2py-menu')}}
+    <script>
+      jQuery(document).ready(function(){jQuery('ul.web2py-menu').superfish({delay:400});});
+    </script>
+    </div>
+    <!-- end div#menu -->
+   </div>
+   <!-- end div#header -->
+   <div id="page">
+    <div id="content">
+     <div class="flash">{{=response.flash or ''}}</div>
+     {{include}}
+    </div>
+    <!-- end div#content -->
+    <div id="sidebar">
+     <ul>
+      <li id="submenu">
+       <h2>
+        Other Links
+       </h2>
+       <ul>
+        <li>
+         <a href="#">
+          Semper vestibulum
+         </a>
+        </li>
+        <li>
+         <a href="#">
+          Vestibulum luctus
+         </a>
+        </li>
+        <li>
+         <a href="#">
+          Integer rutrum
+         </a>
+        </li>
+        <li>
+         <a href="#">
+          Etiam malesuada
+         </a>
+        </li>
+        <li>
+         <a href="#">
+          Elementum facilisis
+         </a>
+        </li>
+        <li>
+         <a href="#">
+          Ut tincidunt
+         </a>
+        </li>
+        <li>
+         <a href="#">
+          Odio sagittis
+         </a>
+        </li>
+       </ul>
+      </li>
+      <!-- end li#submenu -->
+      <li id="news">
+       <h2>
+        News &amp; Updates
+       </h2>
+       <ul>
+        <li>
+         <h3>
+          25th May
+         </h3>
+         <p>
+          <a href="#">
+           Pellentesque quis elit non lectus gravida blandit&hellip;
+          </a>
+         </p>
+        </li>
+        <li>
+         <h3>
+          23rd May
+         </h3>
+         <p>
+          <a href="#">
+           Lorem ipsum dolor sit amet, consectetuer adipiscing&hellip;
+          </a>
+         </p>
+        </li>
+        <li>
+         <h3>
+          21st May
+         </h3>
+         <p>
+          <a href="#">
+           Phasellus nec erat sit amet nibh pellentesque congue&hellip;
+          </a>
+         </p>
+        </li>
+        <li>
+         <h3>
+          17th May
+         </h3>
+         <p>
+          <a href="#">
+           Maecenas vitae orci vitae tellus feugiat eleifend&hellip;
+          </a>
+         </p>
+        </li>
+       </ul>
+      </li>
+      <!-- end li#news -->
+     </ul>
+    </div>
+    <!-- end div#sidebar -->
+    <div style="clear: both; height: 1px">
+    </div>
+   </div>
+   <!-- end div#page -->
+   <div id="footer">
+    <p id="legal">
+     Copyright &copy; 2007 Fun Ride. All Rights Reserved. Designed by
+     <a href="http://www.freecsstemplates.org/">
+      Free CSS Templates
+     </a>
+     .
+    </p>
+    <p id="links">
+     <a href="#">
+      Privacy Policy
+     </a>
+     |
+     <a href="#">
+      Terms of Use
+     </a>
+    </p>
+   </div>
+   <!-- end div#footer -->
+  </div>
+  <!-- end div#wrapper -->
+ </body>
+</html>

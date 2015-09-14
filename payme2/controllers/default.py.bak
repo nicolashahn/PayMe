@@ -1,0 +1,151 @@
+#   Global variables (defined in db_friends.py
+
+#   User, Link, Post = db.auth_user, db.link, db.post
+#   me, a0, a1 = auth.user_id, request.args(0), request.args(1)
+#   myfriends = db(Link.source==me)(Link.accepted==True)
+#   alphabetical = User.first_name|User.last_name
+#   def name_of(user): return '%(first_name)s %(last_name)s' % user
+
+import random
+
+def index():
+    if auth.user: redirect(URL('home'))
+    else: redirect(URL('user/login'))
+    return locals()
+
+def user():
+    return dict(form=auth())
+
+def download():
+    return response.download(request,db)
+
+def confirmation():
+    vars = request.post_vars
+    transactionID = request.args(0).split('?')
+    db(db.post.id == transactionID[0]).update(paid=True)
+    return locals()
+
+def call():
+    session.forget()
+    return service()
+
+# our home page, will show our posts and posts by friends
+@auth.requires_login()
+def home():
+    user = User(me)
+    friendsList = db(db.link.source == user)(db.link.accepted == True).select()
+    """
+    test = [,
+    for friend in friendsList:
+        if (friend.accepted == True):
+            test.append(friend.target)
+    """
+    Post.posted_by.default = me
+    Post.posted_on.default = request.now
+    #Post.posted_to.
+    Post.amount.default = '0.00'
+    #uniqueIDs = db(db.post.uniqueID).select()
+    #response.flash = uniqueIDs
+    #Post.uniqueID.default = random.randint(10000,99999)
+    form = SQLFORM(Post, 
+                   submit_button='Post Charge!',
+                   formstyle='table3cols')
+    friends = [me]+[row.target for row in myfriends.select(Link.target)]
+    #posts = db(Post.posted_by.belongs(friends)).select(orderby=~Post.posted_on,limitby=(0,100))
+    posts = db(Post.posted_by==user.id).select(orderby=~Post.posted_on,limitby=(0,100))
+    
+    if form.process().accepted:
+       response.flash = 'Charge posted!'
+    elif form.errors:
+       response.flash = 'Please correct errors'
+    
+    
+    return locals()
+"""
+# our wall, will show our profile and our own posts
+@auth.requires_login()
+def wall():
+    user = User(a0 or me)
+    if not user or not (user.id==me or myfriends(Link.target==user.id).count()):
+        redirect(URL('home'))
+    posts = db(Post.posted_by==user.id).select(orderby=~Post.posted_on,limitby=(0,100))
+    return locals()
+"""
+# same as wall, except holds posted_to instead of posted_by
+@auth.requires_login()
+def charges():
+    user = User(a0 or me)
+    posts = db(Post.posted_to==user.id)(Post.paid==False).select(orderby=~Post.posted_on,limitby=(0,100))
+    return locals()
+
+# a page for searching friends and requesting friendship
+# not going to use this anymore, friends page will have search
+@auth.requires_login()
+def search():
+    currentuser = User(me)
+    form = SQLFORM.factory(Field('name',requires=IS_NOT_EMPTY()))
+    if form.accepts(request):
+        tokens = form.vars.name.split()
+        query = reduce(lambda a,b:a&b,
+                       [User.first_name.contains(k)|User.last_name.contains(k) \
+                            for k in tokens])
+        people = db(query).select(orderby=alphabetical)
+    else:
+        people = []
+    return locals()
+
+# a page for accepting and denying friendship requests
+@auth.requires_login()
+def friends():
+    message = ""
+    friends = db(User.id==Link.source)(Link.target==me).select(orderby=alphabetical)
+    if db(User.id==Link.source)(Link.target==me).count() == 0:
+        message = "you have no friends :("
+    requests = db(User.id==Link.target)(Link.source==me).select(orderby=alphabetical)
+    pendings = db(User.id==Link.target)(Link.source==me)(Link.accepted==False).select(orderby=alphabetical)
+    
+    #search page code
+    currentuser = User(me)
+    form = SQLFORM.factory(Field('name',requires=IS_NOT_EMPTY()))
+    if form.accepts(request):
+        tokens = form.vars.name.split()
+        query = reduce(lambda a,b:a&b,
+                       [User.first_name.contains(k)|User.last_name.contains(k) \
+                            for k in tokens])
+        people = db(query).select(orderby=alphabetical)
+    else:
+        people = []
+    return locals()
+
+# this is the Ajax callback
+@auth.requires_login()
+def friendship():
+    """AJAX callback!"""
+    if request.env.request_method!='POST': raise HTTP(400)
+    if a0=='request' and not (Link(source=a1,target=me) or Link(source=me,target=a1) or Link(source=me,target=me)):
+        # insert a new friendship request
+        Link.insert(source=me,target=a1)
+        #Link.insert(source=a1,target=me)
+        
+    elif a0=='accept':
+        if not db(Link.source==me)(Link.target==a1).count():
+            Link.insert(source=me,target=a1)
+        # accept an existing friendship request
+        db(Link.target==me)(Link.source==a1).update(accepted=True)
+        db(Link.target==a1)(Link.source==me).update(accepted=True)
+            
+    elif a0=='deny':
+        # deny an existing friendship request
+        db(Link.target==me)(Link.source==a1).delete()
+        db(Link.target==a1)(Link.source==me).delete()
+        
+    elif a0=='remove':
+        # delete a previous friendship request
+        db(Link.source==me)(Link.target==a1).delete()
+        db(Link.source==a1)(Link.target==me).delete()
+        
+@auth.requires_login()
+def payment():
+    if request.env.request_method!='POST': raise HTTP(400)
+    if a0=='paid':
+        db(Post.id==a1).update(paid=True)

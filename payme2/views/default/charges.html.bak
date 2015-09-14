@@ -1,0 +1,51 @@
+{{extend 'layout.html'}}
+<h3>Profile</h3>
+{{=crud.read(db.auth_user,user)}}
+<h3>Charges</h3>
+{{for post in posts:}}
+<div style="background: #f0f0f0; margin-bottom: 5px; padding: 8px;">
+ <h4>{{=name_of(post.posted_by)}} to {{=name_of(post.posted_to)}} on {{=post.posted_on}}:</h4>
+  <h4 style="color:red">{{=post.amount}} </h4>
+        for:
+        <br>
+        {{=post.body}}
+    {{if (post.paid == False):}}
+        <br>
+        {{if post.posted_to == me:}}
+<form action="https://www.sandbox.paypal.com/cgi-bin/webscr" method="post" target="_top">
+<input type="hidden" name="cmd" value="_donations">
+<input type="hidden" name="business" value="{{=post.posted_by.email}}">
+<input type="hidden" name="lc" value="US">
+<input type="hidden" name="item_name" value="{{=post.body}}">
+<input type="hidden" name="amount" value="{{=post.amount}}">
+<input type="hidden" name="currency_code" value="USD">
+<input type="hidden" name="no_note" value="0">
+<input type="hidden" name="bn" value="PP-DonationsBF:btn_donate_LG.gif:NonHostedGuest">
+    <input type="hidden" name="rm" value="2">
+    <input type="hidden" name="return" value="http://127.0.0.1:8000/paymev5/default/confirmation/{{=post.id}}"/>
+<input type="image" src="paymeV7/private/paybutton.png" border="0" name="submit" alt="PayPal - The safer, easier way to pay online!">
+<img alt="" border="0" src="https://www.paypalobjects.com/en_US/i/scr/pixel.gif" width="1" height="1">
+</form>
+
+        {{else:}}
+            <h3 style="color:red">
+                Not yet paid
+            </h3>
+        {{pass}}
+        
+    {{pass}}
+    
+    {{if (post.paid == True):}}
+        <br>
+        <h3 style="color:green">
+            Paid!
+        </h3>
+    {{pass}}
+    
+    {{if post.image:}}
+    <br>
+    <img width="200px" src="{{=URL('download', args=post.image)}}" />
+    {{pass}}
+</div>
+
+{{pass}}

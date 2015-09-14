@@ -1,0 +1,92 @@
+{{extend 'layout.html'}}
+
+{{block head}}
+
+<script>
+    $(document).ready(function(){
+        $("#accept").click(function(){
+            delete window.("#deny");
+        }
+        $("#deny").click(function(){
+            delete window.("#accept");
+        }
+</script>
+
+{{end}}
+
+<table>
+    <col width="400">
+    <col width="400">
+    <tr>
+        <td>
+            <h2>Friends:</h2>
+            <table>
+                {{=nofriends}}
+              {{for friend in friends:}}
+              <tr>
+                <td>{{=A(name_of(friend.auth_user),_href=URL('charges',args=friend.auth_user.id))}}</td>
+                <td>{{if friend.link.accepted:}}
+                    accepted 
+                        <div>
+                            <button id="remove" onclick="ajax('{{=URL('friendship',args=('remove',friend.auth_user.id))}}',[],null); $(this).parent().html('removed')">remove friend</button>
+                        </div>
+                    {{else:}}
+                    <button id ="accept" onclick="ajax('{{=URL('friendship',args=('accept',friend.auth_user.id))}}',[],null); $(this).parent().html('accepted')">accept</button></td>
+               <td><button id = "deny" onclick="ajax('{{=URL('friendship',args=('deny',friend.auth_user.id))}}',[],null); $(this).parent().html('denied')">deny</button>
+                   {{pass}}</td>
+              </tr>
+              {{pass}}
+            </table>
+
+            <!--
+            <h2>Friendship Requested</h2>
+            <table>
+              {{for friend in requests:}}
+              <tr>
+                <td>{{=A(name_of(friend.auth_user),_href=URL('charges',args=friend.auth_user.id))}}</td>
+                <td>{{if friend.link.accepted:}}accepted{{else:}}pending</td>
+                <td><button onclick="ajax('{{=URL('friendship',args=('deny',friend.auth_user.id))}}',[],null); $(this).parent().html('removed')">remove</button>{{pass}}</td>
+              </tr>
+              {{pass}}
+            </table>
+            -->
+            {{if pendings:}}
+                <h3>Pending:</h3>
+                <table>
+                    {{for notfriend in pendings:}}
+                        <tr>
+                            <td>{{=A(name_of(notfriend.auth_user),_href=URL('charges',args=notfriend.auth_user.id))}}</td>
+                        </tr>
+                    {{pass}}
+                </table>
+            {{pass}}
+            
+        </td>
+
+        <td>
+            <h3>Search for friends</h3>
+            {{=form}}
+            {{if people:}}
+            <h3>Results:</h3>
+            <table>
+               {{for user in people:}}
+                <tr>
+                   <td>{{=A(name_of(user), _href=URL('charges',args=user.id))}}</td>
+                   <td>
+                       {{if (user.id != currentuser.id) and (user.id not in pendings) and (user.id not in friends):}}
+                       <button onclick="ajax('{{=URL('friendship',args=('request',user.id))}}',[],null);$(this).parent().html('pending')">request friendship</button>
+                       {{pass}}
+                   </td>
+                </tr>
+               {{pass}}
+            </table>
+
+            {{pass}}
+            {{if not people:}}
+                No users found
+            {{pass}}
+
+            <br>
+        <td>
+    </tr>
+</table>

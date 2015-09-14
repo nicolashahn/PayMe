@@ -1,0 +1,22 @@
+{{extend 'layout.html'}}
+<h3>Search for friends</h3>
+{{=form}}
+{{if people:}}
+<h3>Results</h3>
+<table>
+   {{for user in people:}}
+    <tr>
+       <td>{{=A(name_of(user), _href=URL('charges',args=user.id))}}</td>
+       <td>
+           {{if user.id != currentuser.id:}}
+           <button onclick="ajax('{{=URL('friendship',args=('request',user.id))}}',[],null);$(this).parent().html('pending')">request friendship</button>
+           {{pass}}
+       </td>
+    </tr>
+   {{pass}}
+</table>
+
+{{pass}}
+{{if not people:}}
+    No users found
+{{pass}}
